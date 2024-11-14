@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Speech Converter</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-image: url('https://cdn.pixabay.com/photo/2022/08/23/01/36/colorful-waves-7404806_960_720.jpg');  /* Add the image path */
+            background-size: cover;  /* Ensures the image covers the entire screen */
+            background-position: center;  /* Centers the image */
+            background-repeat: no-repeat;  /* Prevents the image from repeating */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.8);  /* Slightly transparent background to make text readable */
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 15px 15px 1px rgba(0, 0, 0, 1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            border: #000000 1px solid;
+        }
+
+        h1 {
+            color: #5A5A5A;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            max-width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+
+        select {
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-size: 1em;
+            width: 100%;
+            border: 2px solid #ddd;
+            background: #f9f9f9;
+        }
+
+        button {
+            background-color: #6e8efb;
+            color: white;
+            padding: 12px 20px;
+            border: #000000 1px solid;
+            box-shadow: 8px 8px 1px rgba(0, 0, 0, 1);
+            border-radius: 8px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #5a77d0;
+        }
+
+        audio {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Text to Speech Converter</h1>
+
+        <!-- Form for Text and Voice Selection -->
+        <form id="ttsForm" action="/" method="POST">
+            <textarea name="text" id="text" rows="4" cols="50" placeholder="Enter text here..."></textarea>
+
+            <!-- Voice Selection Dropdown -->
+            <select name="voice" id="voice" required>
+                <option value="0">Male Voice</option>
+                <option value="1">Female Voice</option>
+            </select>
+
+            <!-- Convert Button -->
+            <button type="submit" class="button">Convert to Speech</button>
+        </form>
+
+        <!-- Audio Element for Preview -->
+        <audio id="audioPreview" controls style="display:none;"></audio>
+    </div>
+
+    <script>
+        // JavaScript function to send preview request
+        async function previewAudio() {
+            const text = document.getElementById('text').value;
+            const voice = document.getElementById('voice').value;
+
+            if (!text) {
+                alert('Please enter some text to preview.');
+                return;
+            }
+
+            // Fetch preview audio from the backend
+            const response = await fetch('/preview', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text, voice })
+            });
+
+            if (response.ok) {
+                const audioUrl = URL.createObjectURL(await response.blob());
+                const audioPreview = document.getElementById('audioPreview');
+                audioPreview.src = audioUrl;
+                audioPreview.style.display = 'block';
+                audioPreview.play();
+            } else {
+                alert('Error generating preview. Please try again.');
+            }
+        }
+    </script>
+</body>
+</html>
